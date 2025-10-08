@@ -1,0 +1,19 @@
+import * as express from "express";
+import { authentification } from "../middleware/authentification";
+import { authorization } from "../middleware/authorization";
+import { userRoles } from "../enum/user-roles.enum";
+import { userRepository } from "../repository";
+import { AppointmentController } from "../controllers/appointment.controller";
+import { appointmentValidator } from "../middleware/appointment.validator";
+
+const Router = express.Router();
+
+Router.post(
+  "/appointment",
+  authentification,
+  authorization([userRoles.DOCTOR, userRoles.PATIENT]),
+  appointmentValidator,
+  AppointmentController.createAppointment
+);
+
+export { Router as appointmentRouter };
