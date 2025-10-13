@@ -25,7 +25,7 @@ export class UserController {
 
     if (user.role === userRoles.DOCTOR) {
       const newDoctor = new Doctor();
-      newDoctor.  = user;
+      newDoctor.user = user;
       newDoctor.designation = "";
       newDoctor.department = "";
       newDoctor.mobile = "";
