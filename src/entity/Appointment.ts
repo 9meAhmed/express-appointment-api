@@ -13,37 +13,31 @@ import { Doctor } from "./Doctor";
 @Entity({ name: "appointments" })
 export class Appointment {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @ManyToOne(() => Doctor, (doctor) => doctor.appointments)
   @JoinColumn()
-  doctor: Doctor;
+  doctor!: Doctor;
 
   @ManyToOne(() => Patient, (patient) => patient.appointments)
   @JoinColumn()
-  patient: Patient;
-
-  @Column()
-  doctorId: number;
-
-  @Column()
-  patientId: number;
+  patient!: Patient;
 
   @Column({ nullable: false })
-  dateTime: Date;
+  dateTime!: Date;
 
   @Column({ nullable: true })
-  age: number;
+  age?: number;
 
   @Column({ nullable: true })
-  status: string;
+  status?: string;
 
   @Column({ nullable: true })
-  remarks: string;
+  remarks?: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt?: Date;
 }

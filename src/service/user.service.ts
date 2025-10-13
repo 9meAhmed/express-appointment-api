@@ -1,6 +1,10 @@
 import { Repository } from "typeorm";
 import { User } from "../entity/User";
 import Encrypt from "../helpers/encrypt.helper";
+import { userRoles } from "../enum/user-roles.enum";
+import { Patient } from "../entity/Patient";
+import { patientRepository, doctorRepository } from "../repository";
+import { Doctor } from "../entity/Doctor";
 
 export class UserService {
   constructor(private userRepository: Repository<User>) {}
@@ -21,12 +25,7 @@ export class UserService {
   }
 
   async createUser(user: User): Promise<User> {
-    const payload = {
-      ...user,
-      password: await Encrypt.hashPassword(user.password),
-    };
-
-    const newUser = this.userRepository.create(payload);
+    const newUser = await this.userRepository.create(user);
     await this.userRepository.save(newUser);
     return newUser;
   }

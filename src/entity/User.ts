@@ -34,15 +34,25 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
+  @Column({ nullable: true })
+  otpCode: number;
+
+  @Column({ nullable: true })
+  otpCodeValidTill: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => Patient, (patient: Patient) => patient.user)
+  @OneToOne(() => Patient, (patient: Patient) => patient.user, {
+    cascade: ["insert"],
+  })
   patient: Patient;
 
-  @OneToOne(() => Doctor, (doctor: Doctor) => doctor.user)
+  @OneToOne(() => Doctor, (doctor: Doctor) => doctor.user, {
+    cascade: ["insert"],
+  })
   doctor: Doctor;
 }

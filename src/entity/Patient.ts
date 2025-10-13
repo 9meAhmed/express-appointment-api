@@ -14,14 +14,14 @@ import { Appointment } from "./Appointment";
 @Entity({ name: "patients" })
 export class Patient {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @OneToOne(() => User, (user) => user.patient)
   @JoinColumn()
   user: User;
 
   @OneToMany(() => Appointment, (appointment) => appointment.patient)
-  appointments: Appointment[];
+  appointments?: Appointment[];
 
   @Column({ nullable: true })
   mobile: string;
@@ -30,8 +30,8 @@ export class Patient {
   address: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt?: Date;
 }

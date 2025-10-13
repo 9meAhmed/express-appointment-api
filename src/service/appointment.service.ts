@@ -4,12 +4,18 @@ import { Appointment } from "../entity/Appointment";
 export class AppointmentService {
   constructor(private appointmentRepository: Repository<Appointment>) {}
 
-  async findAll(): Promise<Appointment[]> {
-    return this.appointmentRepository.find();
+  async findAll(query): Promise<Appointment[]> {
+    return this.appointmentRepository.find({
+      where: { ...query },
+      relations: ["patient.user", "doctor.user"],
+    });
   }
 
   async findById(id: number): Promise<Appointment | null> {
-    return this.appointmentRepository.findOneBy({ id });
+    return this.appointmentRepository.findOne({
+      where: { id },
+      relations: ["patient.user", "doctor.user"],
+    });
   }
 
   async createAppointment(appointment: Appointment): Promise<Appointment> {
@@ -22,7 +28,7 @@ export class AppointmentService {
     id: number,
     appointmentData: Partial<Appointment>
   ): Promise<Appointment | null> {
-    const appointment = await this.appointmentRepository.findOneBy({ id });
+    const appointment = await this.findById(id);
     if (!appointment) return null;
 
     this.appointmentRepository.merge(appointment, appointmentData);

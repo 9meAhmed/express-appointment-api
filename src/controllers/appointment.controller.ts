@@ -1,13 +1,51 @@
+import { AppointmentStatus } from "../enum/appointment-status.enum";
 import { Request, Response } from "express";
-import { appointmentRepository } from "../repository";
+import {
+  appointmentRepository,
+  patientRepository,
+  doctorRepository,
+} from "../repository";
+import Mailer from "../helpers/mailer.helper";
+import { Appointment } from "../entity/Appointment";
 export class AppointmentController {
   static async getAllAppointments(req: Request, res: Response) {
-    const appointments = await appointmentRepository.findAll();
+    const { query } = req;
+    let whereParams = {};
+
+    if (query.doctorId) {
+      const doctorId = Number(query?.doctorId);
+      whereParams = {
+        ...whereParams,
+        doctor: { id: doctorId },
+      };
+    }
+
+    if (query.patientId) {
+      const patientId = Number(query?.patientId);
+      whereParams = {
+        ...whereParams,
+        patient: { id: patientId },
+      };
+    }
+
+    const appointments = await appointmentRepository.findAll(whereParams);
     res.json(appointments);
   }
 
   static async createAppointment(req: Request, res: Response) {
-    const appointment = await appointmentRepository.createAppointment(req.body);
+    const { patientId, doctorId, dateTime } = req.body;
+    const patient = await patientRepository.findById(patientId);
+    const doctor = await doctorRepository.findById(doctorId);
+
+    const appointment = await appointmentRepository.createAppointment({
+      ...req.body,
+      patient,
+      doctor,
+      dateTime: new Date(dateTime),
+    });
+
+    AppointmentController.sendAppointmentEmail(appointment);
+
     res.status(201).json(appointment);
   }
 
@@ -17,6 +55,9 @@ export class AppointmentController {
       appointmentId,
       req.body
     );
+
+    AppointmentController.sendAppointmentEmail(appointment);
+
     res.status(200).json(appointment);
   }
 
@@ -27,6 +68,46 @@ export class AppointmentController {
       res.status(404).json({ message: "Appointment not found" });
     } else {
       res.status(200).json(null);
+    }
+  }
+
+  private static async sendAppointmentEmail(appointment: Appointment) {
+    if (appointment.status === AppointmentStatus.BOOKED) {
+      Mailer.sendMail(
+        appointment.patient.user.email,
+        "Appointment Confirmation",
+        `Hello ${appointment.patient.user.firstName} ${appointment.patient.user.lastName}, \n\n Your appointment is confirmed for ${appointment.dateTime}.`
+      );
+
+      Mailer.sendMail(
+        appointment.doctor.user.email,
+        "New Appointment Scheduled",
+        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n A new appointment has been scheduled with ${appointment.patient.user.firstName} ${appointment.patient.user.lastName} for ${appointment.dateTime}.`
+      );
+    } else if (appointment.status === AppointmentStatus.CANCELLED) {
+      Mailer.sendMail(
+        appointment.patient.user.email,
+        "Appointment Cancelled",
+        `Hello ${appointment.patient.user.firstName} ${appointment.patient.user.lastName}, \n\n Your appointment has been cancelled. Please contact the clinic for more details.`
+      );
+
+      Mailer.sendMail(
+        appointment.doctor.user.email,
+        "Appointment Cancelled",
+        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n The appointment with ${appointment.patient.user.firstName} ${appointment.patient.user.lastName} has been cancelled.`
+      );
+    } else if (appointment.status === AppointmentStatus.RESCHEDULED) {
+      Mailer.sendMail(
+        appointment.patient.user.email,
+        "Appointment Rescheduled",
+        `Hello ${appointment.patient.user.firstName} ${appointment.patient.user.lastName}, \n\n Your appointment has been rescheduled. Please contact the clinic for more details.`
+      );
+
+      Mailer.sendMail(
+        appointment.doctor.user.email,
+        "Appointment Rescheduled",
+        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n The appointment with ${appointment.patient.user.firstName} ${appointment.patient.user.lastName} has been rescheduled.`
+      );
     }
   }
 }
