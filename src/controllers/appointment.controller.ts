@@ -10,6 +10,11 @@ import { Appointment } from "../entity/Appointment";
 export class AppointmentController {
   static async getAllAppointments(req: Request, res: Response) {
     const { query } = req;
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
     let whereParams = {};
 
     if (query.doctorId) {
@@ -28,7 +33,18 @@ export class AppointmentController {
       };
     }
 
-    const appointments = await appointmentRepository.findAll(whereParams);
+    if (query.status) {
+      whereParams = {
+        ...whereParams,
+        status: query.status,
+      };
+    }
+
+    const appointments = await appointmentRepository.findAll(
+      whereParams,
+      skip,
+      limit
+    );
     res.json(appointments);
   }
 

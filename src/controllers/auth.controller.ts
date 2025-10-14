@@ -13,12 +13,8 @@ import { Doctor } from "../entity/Doctor";
 
 export class AuthController {
   static async registerUser(req: Request, res: Response) {
-    const otpCode = AuthController.generateOtp(); // Generate a 6-digit OTP
     const payload = {
       ...req.body,
-      otpCode,
-      otpCodeValidTill: AuthController.generateOtpValidTill(),
-      password: await Encrypt.hashPassword(req.body.password),
     };
 
     const user = await userRepository.createUser(payload);
@@ -86,10 +82,8 @@ export class AuthController {
       if (user.isVerified) {
         return res.status(400).json({ message: "User is already verified" });
       } else {
-        const otpCode = AuthController.generateOtp();
-
-        user.otpCode = otpCode;
-        user.otpCodeValidTill = AuthController.generateOtpValidTill();
+        user.generateOtp();
+        user.generateOtpValidTill();
         await userRepository.updateUser(user.id, user);
 
         Mailer.sendMail(
@@ -143,19 +137,17 @@ export class AuthController {
   }
 
   static async forgotPassword(req: Request, res: Response) {
-    const otpCode = AuthController.generateOtp();
     const user = await userRepository.findByEmail(req.body.email);
 
     if (user) {
-      const updatedUser = await userRepository.updateUser(user.id, {
-        otpCode,
-        otpCodeValidTill: AuthController.generateOtpValidTill(),
-      });
+      user.generateOtp();
+      user.generateOtpValidTill();
+      const updatedUser = await userRepository.updateUser(user.id, user);
 
       Mailer.sendMail(
         user.email,
         "Appointment System - OTP Verification",
-        `Hello ${user.firstName} ${user.lastName},\n\nThank you for registering with us! Please verify your email with OTP: ${updatedUser.otpCode} \n\nBest regards,\nThe Team`
+        `Hello ${updatedUser.firstName} ${updatedUser.lastName},\n\nThank you for registering with us! Please verify your email with OTP: ${updatedUser.otpCode} \n\nBest regards,\nThe Team`
       );
     }
 
@@ -190,13 +182,5 @@ export class AuthController {
     } else {
       return res.status(404).json({ message: "User not found" });
     }
-  }
-
-  private static generateOtp(): number {
-    return Math.floor(100000 + Math.random() * 900000);
-  }
-
-  private static generateOtpValidTill(): Date {
-    return new Date(Date.now() + 5 * 60000); // 5 minutes from now
   }
 }

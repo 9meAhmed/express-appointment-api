@@ -3,7 +3,7 @@ import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
 
 dotenv.config();
-const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, MODE } = process.env;
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT } = process.env;
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -18,21 +18,3 @@ export const AppDataSource = new DataSource({
   entities: ["src/entity/**/*.ts"],
   migrations: ["src/migration/**/*.ts"],
 });
-
-// import "reflect-metadata"
-// import { DataSource } from "typeorm"
-// import { User } from "./entity/User"
-
-// export const AppDataSource = new DataSource({
-//     type: "postgres",
-//     host: "localhost",
-//     port: 5432,
-//     username: "test",
-//     password: "test",
-//     database: "test",
-//     synchronize: true,
-//     logging: false,
-//     entities: [User],
-//     migrations: [],
-//     subscribers: [],
-// })

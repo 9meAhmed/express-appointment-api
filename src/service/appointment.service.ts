@@ -4,10 +4,13 @@ import { Appointment } from "../entity/Appointment";
 export class AppointmentService {
   constructor(private appointmentRepository: Repository<Appointment>) {}
 
-  async findAll(query): Promise<Appointment[]> {
+  async findAll(whereParams, skip, limit): Promise<Appointment[]> {
     return this.appointmentRepository.find({
-      where: { ...query },
+      where: { ...whereParams },
       relations: ["patient.user", "doctor.user"],
+      order: { dateTime: "DESC" },
+      skip,
+      take: limit,
     });
   }
 

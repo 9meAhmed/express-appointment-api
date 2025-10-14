@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -10,6 +11,7 @@ import {
 import { userRoles } from "../enum/user-roles.enum";
 import { Doctor } from "../entity/Doctor";
 import { Patient } from "../entity/Patient";
+import Encrypt from "../helpers/encrypt.helper";
 
 @Entity({ name: "users" })
 export class User {
@@ -55,4 +57,23 @@ export class User {
     cascade: ["insert"],
   })
   doctor: Doctor;
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await Encrypt.hashPassword(this.password);
+  }
+
+  @BeforeInsert()
+  async addOtpCodeAndValidTillDate() {
+    this.otpCode = this.generateOtp();
+    this.otpCodeValidTill = this.generateOtpValidTill();
+  }
+
+  public generateOtp(): number {
+    return Math.floor(100000 + Math.random() * 900000);
+  }
+
+  public generateOtpValidTill(): Date {
+    return new Date(Date.now() + 5 * 60000); // 5 minutes from now
+  }
 }
