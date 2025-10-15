@@ -5,6 +5,7 @@ import {
   userRepository,
 } from "../repository";
 import Encrypt from "../helpers/encrypt.helper";
+import { catchAsync } from "../helpers/catch-async.helper";
 import { UserResponseDto } from "../dto/response/user.dto";
 import Mailer from "../helpers/mailer.helper";
 import { userRoles } from "../enum/user-roles.enum";
@@ -12,7 +13,7 @@ import { Patient } from "../entity/Patient";
 import { Doctor } from "../entity/Doctor";
 
 export class AuthController {
-  static async registerUser(req: Request, res: Response) {
+  static registerUser = catchAsync(async (req: Request, res: Response) => {
     const payload = {
       ...req.body,
     };
@@ -45,7 +46,7 @@ export class AuthController {
     }
 
     res.status(201).json({ user: new UserResponseDto(user) });
-  }
+  });
 
   static async verifyOtp(req: Request, res: Response) {
     const { email, otpCode } = req.body;
@@ -99,7 +100,7 @@ export class AuthController {
     }
   }
 
-  static async loginUser(req: Request, res: Response) {
+  static loginUser = catchAsync(async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const user = await userRepository.findByEmail(email);
 
@@ -116,7 +117,7 @@ export class AuthController {
     res
       .status(200)
       .json({ user: new UserResponseDto(user), token, refreshToken });
-  }
+  });
 
   static async refreshToken(req: Request, res: Response) {
     const { refreshToken } = req.body;

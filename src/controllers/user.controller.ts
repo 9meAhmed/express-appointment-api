@@ -5,6 +5,7 @@ import { Patient } from "../entity/Patient";
 import Encrypt from "../helpers/encrypt.helper";
 import { Doctor } from "../entity/Doctor";
 import { patientRepository, doctorRepository } from "../repository";
+import { catchAsync } from "../helpers/catch-async.helper";
 
 export class UserController {
   static async getAllUsers(req: Request, res: Response) {
@@ -35,15 +36,16 @@ export class UserController {
     res.status(201).json(user);
   }
 
-  static async updateUser(req: Request, res: Response) {
+  static updateUser = catchAsync(async (req: Request, res: Response) => {
     const userId = Number(req.params.id);
 
     if (req.body?.password) {
       req.body.password = await Encrypt.hashPassword(req.body.password);
     }
+
     const user = await userRepository.updateUser(userId, req.body);
     res.status(200).json(user);
-  }
+  });
 
   static async deleteUser(req: Request, res: Response) {
     const userId = Number(req.params.id);
@@ -54,4 +56,18 @@ export class UserController {
       res.status(200).json(null);
     }
   }
+
+  // static updateProfilePicture = catchAsync(
+  //   async (req: Request, res: Response) => {
+  //     const userId = Number(req.params.id);
+  //     if (!req.file) {
+  //       return res.status(400).json({ message: "No file uploaded" });
+  //     }
+
+  //     const user = await userRepository.updateUser(userId, {
+  //       profileImage: req.file.path,
+  //     });
+  //     res.status(200).json(user);
+  //   }
+  // );
 }

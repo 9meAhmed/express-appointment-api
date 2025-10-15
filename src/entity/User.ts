@@ -37,10 +37,13 @@ export class User {
   isVerified: boolean;
 
   @Column({ nullable: true })
-  otpCode: number;
+  otpCode: number | null;
 
   @Column({ nullable: true })
-  otpCodeValidTill: Date;
+  otpCodeValidTill: Date | null;
+
+  @Column({ nullable: true })
+  profileImage?: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

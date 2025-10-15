@@ -2,6 +2,7 @@ import { AppointmentStatus } from "../enum/appointment-status.enum";
 import { Request, Response } from "express";
 import {
   appointmentRepository,
+  appointmentLogRepository,
   patientRepository,
   doctorRepository,
 } from "../repository";
@@ -60,6 +61,8 @@ export class AppointmentController {
       dateTime: new Date(dateTime),
     });
 
+    await appointment.createAppointmentLog();
+
     AppointmentController.sendAppointmentEmail(appointment);
 
     res.status(201).json(appointment);
@@ -71,7 +74,7 @@ export class AppointmentController {
       appointmentId,
       req.body
     );
-
+    await appointment.createAppointmentLog();
     AppointmentController.sendAppointmentEmail(appointment);
 
     res.status(200).json(appointment);
