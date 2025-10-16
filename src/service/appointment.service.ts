@@ -7,7 +7,7 @@ export class AppointmentService {
   async findAll(whereParams, skip, limit): Promise<Appointment[]> {
     return this.appointmentRepository.find({
       where: { ...whereParams },
-      relations: ["patient.user", "doctor.user"],
+      // relations: ["patient.user", "doctor.user"],
       order: { dateTime: "DESC" },
       skip,
       take: limit,
@@ -17,7 +17,7 @@ export class AppointmentService {
   async findById(id: number): Promise<Appointment | null> {
     return this.appointmentRepository.findOne({
       where: { id },
-      relations: ["patient.user", "doctor.user"],
+      // relations: ["patient.user", "doctor.user"],
     });
   }
 

@@ -46,7 +46,15 @@ export class AppointmentController {
       skip,
       limit
     );
-    res.json(appointments);
+
+    const appointmentsResp = await Promise.all(
+      appointments.map(async (appointment) => {
+        const patient = await appointment.patient;
+        return { ...appointment, patient };
+      })
+    );
+
+    res.json(appointmentsResp);
   }
 
   static async createAppointment(req: Request, res: Response) {
@@ -91,41 +99,44 @@ export class AppointmentController {
   }
 
   private static async sendAppointmentEmail(appointment: Appointment) {
+    const patient = appointment.patient;
+    const user = (await patient).user;
+
     if (appointment.status === AppointmentStatus.BOOKED) {
       Mailer.sendMail(
-        appointment.patient.user.email,
+        user.email,
         "Appointment Confirmation",
-        `Hello ${appointment.patient.user.firstName} ${appointment.patient.user.lastName}, \n\n Your appointment is confirmed for ${appointment.dateTime}.`
+        `Hello ${user.firstName} ${user.lastName}, \n\n Your appointment is confirmed for ${appointment.dateTime}.`
       );
 
       Mailer.sendMail(
         appointment.doctor.user.email,
         "New Appointment Scheduled",
-        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n A new appointment has been scheduled with ${appointment.patient.user.firstName} ${appointment.patient.user.lastName} for ${appointment.dateTime}.`
+        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n A new appointment has been scheduled with ${user.firstName} ${user.lastName} for ${appointment.dateTime}.`
       );
     } else if (appointment.status === AppointmentStatus.CANCELLED) {
       Mailer.sendMail(
-        appointment.patient.user.email,
+        user.email,
         "Appointment Cancelled",
-        `Hello ${appointment.patient.user.firstName} ${appointment.patient.user.lastName}, \n\n Your appointment has been cancelled. Please contact the clinic for more details.`
+        `Hello ${user.firstName} ${user.lastName}, \n\n Your appointment has been cancelled. Please contact the clinic for more details.`
       );
 
       Mailer.sendMail(
         appointment.doctor.user.email,
         "Appointment Cancelled",
-        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n The appointment with ${appointment.patient.user.firstName} ${appointment.patient.user.lastName} has been cancelled.`
+        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n The appointment with ${user.firstName} ${user.lastName} has been cancelled.`
       );
     } else if (appointment.status === AppointmentStatus.RESCHEDULED) {
       Mailer.sendMail(
-        appointment.patient.user.email,
+        user.email,
         "Appointment Rescheduled",
-        `Hello ${appointment.patient.user.firstName} ${appointment.patient.user.lastName}, \n\n Your appointment has been rescheduled. Please contact the clinic for more details.`
+        `Hello ${user.firstName} ${user.lastName}, \n\n Your appointment has been rescheduled. Please contact the clinic for more details.`
       );
 
       Mailer.sendMail(
         appointment.doctor.user.email,
         "Appointment Rescheduled",
-        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n The appointment with ${appointment.patient.user.firstName} ${appointment.patient.user.lastName} has been rescheduled.`
+        `Hello Dr. ${appointment.doctor.user.lastName}, \n\n The appointment with ${user.firstName} ${user.lastName} has been rescheduled.`
       );
     }
   }

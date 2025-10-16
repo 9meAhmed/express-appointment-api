@@ -25,7 +25,7 @@ export class Appointment {
 
   @ManyToOne(() => Patient, (patient) => patient.appointments)
   @JoinColumn()
-  patient!: Patient;
+  patient!: Promise<Patient>;
 
   @OneToMany(() => AppointmentLog, (appointmentLog) => appointmentLog.id)
   appointmentLogs!: AppointmentLog[];

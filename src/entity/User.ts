@@ -1,4 +1,5 @@
 import {
+  AfterLoad,
   BeforeInsert,
   Column,
   CreateDateColumn,
@@ -12,9 +13,18 @@ import { userRoles } from "../enum/user-roles.enum";
 import { Doctor } from "../entity/Doctor";
 import { Patient } from "../entity/Patient";
 import Encrypt from "../helpers/encrypt.helper";
+import { existsSync, unlink } from "node:fs";
+
+import * as dotenv from "dotenv";
+
+dotenv.config();
+const { APP_URL } = process.env;
 
 @Entity({ name: "users" })
 export class User {
+  private profileImageDirPath = "/profilePicture/";
+  public profileImageUrl: string;
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -67,9 +77,17 @@ export class User {
   }
 
   @BeforeInsert()
-  async addOtpCodeAndValidTillDate() {
+  addOtpCodeAndValidTillDate() {
     this.otpCode = this.generateOtp();
     this.otpCodeValidTill = this.generateOtpValidTill();
+  }
+
+  @AfterLoad()
+  concatProfilePictureUrl() {
+    if (this.profileImage) {
+      this.profileImageUrl =
+        APP_URL + this.profileImageDirPath + this.profileImage;
+    }
   }
 
   public generateOtp(): number {
@@ -78,5 +96,21 @@ export class User {
 
   public generateOtpValidTill(): Date {
     return new Date(Date.now() + 5 * 60000); // 5 minutes from now
+  }
+
+  public unlinkProfileImage(): void {
+    if (this.profileImage !== null) {
+      const path = "./uploads" + this.profileImageDirPath + this.profileImage;
+
+      if (!existsSync(path)) {
+        console.log(path + " file not found");
+        return;
+      }
+
+      unlink(path, (err) => {
+        if (err) throw err;
+        console.log(path + " was deleted");
+      });
+    }
   }
 }

@@ -9,6 +9,7 @@ import { appointmentRouter } from "./routes/appointment.routes";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(express.static("uploads/"));
 app.use(express.json());
 app.use("/api", authRouter);
 app.use("/api", userRouter);

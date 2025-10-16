@@ -10,6 +10,10 @@ Router.post("/users", userValidator, UserController.createUser);
 Router.put("/users/:id", userValidator, UserController.updateUser);
 Router.delete("/users/:id", UserController.deleteUser);
 
-Router.put("/profile-picture-upload/:id", upload.single("profilePicture"));
+Router.put(
+  "/profile-picture-upload/:id",
+  upload.single("profilePicture"),
+  UserController.updateProfilePicture
+);
 
 export { Router as userRouter };

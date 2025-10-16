@@ -57,17 +57,22 @@ export class UserController {
     }
   }
 
-  // static updateProfilePicture = catchAsync(
-  //   async (req: Request, res: Response) => {
-  //     const userId = Number(req.params.id);
-  //     if (!req.file) {
-  //       return res.status(400).json({ message: "No file uploaded" });
-  //     }
+  static updateProfilePicture = catchAsync(
+    async (req: Request, res: Response) => {
+      const userId = Number(req.params.id);
 
-  //     const user = await userRepository.updateUser(userId, {
-  //       profileImage: req.file.path,
-  //     });
-  //     res.status(200).json(user);
-  //   }
-  // );
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const user = await userRepository.findById(userId);
+
+      user.unlinkProfileImage();
+
+      const updatedUser = await userRepository.updateUser(userId, {
+        profileImage: req.file.filename,
+      });
+      res.status(200).json(updatedUser);
+    }
+  );
 }
