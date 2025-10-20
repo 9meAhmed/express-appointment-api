@@ -184,4 +184,8 @@ export class AuthController {
       return res.status(404).json({ message: "User not found" });
     }
   }
+
+  static async hack(req: Request, res: Response) {}
+
+
 }
