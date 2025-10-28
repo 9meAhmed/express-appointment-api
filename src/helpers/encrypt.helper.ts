@@ -26,7 +26,6 @@ export default class Encrypt {
   }
 
   static verifyToken(token: string): any {
-    console.log(token);
     try {
       return jwt.verify(token, JWT_SECRET);
     } catch (error) {

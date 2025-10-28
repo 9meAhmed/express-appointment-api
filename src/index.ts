@@ -1,16 +1,28 @@
 import "reflect-metadata";
 import * as express from "express";
+import * as cors from "cors";
 import { AppDataSource } from "./data-source";
 import errorHandler from "./middleware/errorHandler";
 import { userRouter } from "./routes/user.routes";
 import { authRouter } from "./routes/auth.routes";
 import { appointmentRouter } from "./routes/appointment.routes";
+import * as cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    optionsSuccessStatus: 200,
+    credentials: true,
+  })
+);
+
 app.use(express.static("uploads/"));
 app.use(express.json());
+app.use(cookieParser());
+
 app.use("/api", authRouter);
 app.use("/api", userRouter);
 app.use("/api", appointmentRouter);

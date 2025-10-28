@@ -6,14 +6,11 @@ export const authentification = async (
   res: Response,
   next: NextFunction
 ) => {
-  const header = req.headers.authorization;
-  if (!header) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-  const token = header.split(" ")[1];
+  const token = req.cookies.access_token;
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
+
   const decode = Encrypt.verifyToken(token);
   if (!decode) {
     return res.status(401).json({ message: "Unauthorized" });
