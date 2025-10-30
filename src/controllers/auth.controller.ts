@@ -126,7 +126,7 @@ export class AuthController {
       secure: false,
     });
 
-    res.status(200).json({ user: new UserResponseDto(user) });
+    res.status(200).json(new UserResponseDto(user));
   });
 
   static async refreshToken(req: Request, res: Response) {
@@ -151,18 +151,22 @@ export class AuthController {
     const user = await userRepository.findByEmail(req.body.email);
 
     if (user) {
-      user.generateOtp();
-      user.generateOtpValidTill();
-      const updatedUser = await userRepository.updateUser(user.id, user);
+      const updatedUser = await userRepository.updateUser(user.id, {
+        ...user,
+        otpCode: user.generateOtp(),
+        otpCodeValidTill: user.generateOtpValidTill(),
+      });
 
       Mailer.sendMail(
         user.email,
         "Appointment System - OTP Verification",
         `Hello ${updatedUser.firstName} ${updatedUser.lastName},\n\nThank you for registering with us! Please verify your email with OTP: ${updatedUser.otpCode} \n\nBest regards,\nThe Team`
       );
+
+      res.status(200).json({ message: "OTP resent successfully", updatedUser });
     }
 
-    res.status(200).json({ message: "OTP resent successfully" });
+    res.status(404).json({ message: "User not found" });
   }
 
   static async resetPassword(req: Request, res: Response) {
@@ -195,7 +199,15 @@ export class AuthController {
     }
   }
 
-  static async hack(req: Request, res: Response) {}
+  static async profile(req: Request, res: Response) {
+    const user = req.headers["user"] as any;
 
+    const foundUser = await userRepository.findById(user.id);
 
+    if (foundUser) {
+      return res.status(200).json(new UserResponseDto(foundUser));
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
+  }
 }
