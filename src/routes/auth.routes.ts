@@ -16,5 +16,6 @@ Router.post(
   AuthController.resetPassword
 );
 Router.get("/profile", authentification, AuthController.profile);
+Router.get("/logout", authentification, AuthController.logout);
 
 export { Router as authRouter };

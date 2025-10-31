@@ -91,11 +91,15 @@ export class User {
   }
 
   public generateOtp(): number {
-    return Math.floor(100000 + Math.random() * 900000);
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    this.otpCode = otp;
+    return otp;
   }
 
   public generateOtpValidTill(): Date {
-    return new Date(Date.now() + 5 * 60000); // 5 minutes from now
+    const otpValidTill = new Date(Date.now() + 5 * 60000); // 5 minutes from now
+    this.otpCodeValidTill = otpValidTill;
+    return otpValidTill;
   }
 
   public unlinkProfileImage(): void {

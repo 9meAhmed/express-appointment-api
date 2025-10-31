@@ -12,6 +12,9 @@ import { userRoles } from "../enum/user-roles.enum";
 import { Patient } from "../entity/Patient";
 import { Doctor } from "../entity/Doctor";
 
+const ACCESS_TOKEN_KEY = "access_token";
+const REFRESH_TOKEN_KEY = "referesh_token";
+
 export class AuthController {
   static registerUser = catchAsync(async (req: Request, res: Response) => {
     const payload = {
@@ -115,12 +118,12 @@ export class AuthController {
     const accessToken = await Encrypt.generateToken({ id: user.id });
     const refreshToken = await Encrypt.generateRefreshToken({ id: user.id });
 
-    res.cookie("access_token", accessToken, {
+    res.cookie(ACCESS_TOKEN_KEY, accessToken, {
       httpOnly: true,
       sameSite: "lax",
       secure: false,
     });
-    res.cookie("refresh_token", refreshToken, {
+    res.cookie(REFRESH_TOKEN_KEY, refreshToken, {
       httpOnly: true,
       sameSite: "lax",
       secure: false,
@@ -130,18 +133,30 @@ export class AuthController {
   });
 
   static async refreshToken(req: Request, res: Response) {
-    const { refreshToken } = req.body;
-    if (!refreshToken) {
+    const oldRefreshToken = req.cookies.refresh_token;
+
+    if (!oldRefreshToken) {
       return res.status(400).json({ message: "Refresh token is required" });
     }
 
     try {
-      const payload = await Encrypt.verifyToken(refreshToken);
-      const newToken = await Encrypt.generateToken({ id: payload.id });
-      const newRefreshToken = await Encrypt.generateRefreshToken({
+      const payload = await Encrypt.verifyToken(oldRefreshToken);
+
+      const accessToken = await Encrypt.generateToken({ id: payload.id });
+      const refreshToken = await Encrypt.generateRefreshToken({
         id: payload.id,
       });
-      res.status(200).json({ token: newToken, refreshToken: newRefreshToken });
+      res.cookie("access_token", accessToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+      });
+      res.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+      });
+      res.status(200).json({ message: "Token refreshed successfully" });
     } catch (error) {
       res.status(401).json({ message: "Invalid refresh token" });
     }
@@ -151,10 +166,10 @@ export class AuthController {
     const user = await userRepository.findByEmail(req.body.email);
 
     if (user) {
+      user.generateOtp();
+      user.generateOtpValidTill();
       const updatedUser = await userRepository.updateUser(user.id, {
         ...user,
-        otpCode: user.generateOtp(),
-        otpCodeValidTill: user.generateOtpValidTill(),
       });
 
       Mailer.sendMail(
@@ -209,5 +224,11 @@ export class AuthController {
     } else {
       return res.status(404).json({ message: "User not found" });
     }
+  }
+
+  static async logout(req: Request, res: Response) {
+    res.clearCookie(ACCESS_TOKEN_KEY);
+    res.clearCookie(REFRESH_TOKEN_KEY);
+    res.status(200).json({ message: "Logged out successfully" });
   }
 }
