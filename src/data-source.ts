@@ -3,7 +3,9 @@ import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 
 dotenv.config();
-const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT } = process.env;
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, MODE } = process.env;
+
+const isDev = MODE === "development";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -15,6 +17,6 @@ export const AppDataSource = new DataSource({
 
   synchronize: false,
   logging: false,
-  entities: ["src/entity/**/*.ts"],
-  migrations: ["src/migration/**/*.ts"],
+  entities: [isDev ? "src/entity/**/*.ts" : "build/entity/**/*.js"],
+  migrations: [isDev ? "src/migration/**/*.ts" : "build/migration/**/*.js"],
 });
