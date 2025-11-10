@@ -7,9 +7,9 @@ const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT } = process.env;
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: DB_HOST || "db.ifjyrvygbmccilimdojs.supabase.co",
+  host: DB_HOST || "aws-1-ap-southeast-2.pooler.supabase.com",
   port: Number(DB_PORT) || 5432,
-  username: DB_USER || "postgres",
+  username: DB_USER || "postgres.ifjyrvygbmccilimdojs",
   password: DB_PASSWORD || "vb2SxfcTg55)MFx",
   database: DB_NAME || "postgres",
 
