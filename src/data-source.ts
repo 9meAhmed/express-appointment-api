@@ -17,6 +17,14 @@ export const AppDataSource = new DataSource({
 
   synchronize: false,
   logging: false,
-  entities: [isDev ? "src/entity/**/*.ts" : "build/entity/**/*.js"],
-  migrations: [isDev ? "src/migration/**/*.ts" : "build/migration/**/*.js"],
+  // entities: [isDev ? "src/entity/**/*.ts" : "build/entity/**/*.js"],
+  // migrations: [isDev ? "src/migration/**/*.ts" : "build/migration/**/*.js"],
+  entities:
+    process.env.NODE_ENV === "production"
+      ? [__dirname + "/entities/*.js"]
+      : [__dirname + "/entities/*.ts"],
+  migrations:
+    process.env.NODE_ENV === "production"
+      ? [__dirname + "/migrations/*.js"]
+      : [__dirname + "/migrations/*.ts"],
 });
