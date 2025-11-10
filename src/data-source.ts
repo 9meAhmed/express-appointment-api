@@ -19,10 +19,8 @@ export const AppDataSource = new DataSource({
   logging: false,
   // entities: [isDev ? "src/entity/**/*.ts" : "build/entity/**/*.js"],
   // migrations: [isDev ? "src/migration/**/*.ts" : "build/migration/**/*.js"],
-  entities: isDev
-    ? [__dirname + "/entities/*.js"]
-    : [__dirname + "/entities/*.ts"],
+  entities: isDev ? [__dirname + "/entity/*.js"] : [__dirname + "/entity/*.ts"],
   migrations: isDev
-    ? [__dirname + "/migrations/*.js"]
-    : [__dirname + "/migrations/*.ts"],
+    ? [__dirname + "/migration/*.js"]
+    : [__dirname + "/migration/*.ts"],
 });
