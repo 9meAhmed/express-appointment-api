@@ -7,9 +7,9 @@ import { userRouter } from "./routes/user.routes";
 import { authRouter } from "./routes/auth.routes";
 import { appointmentRouter } from "./routes/appointment.routes";
 import cookieParser from "cookie-parser";
+import { VercelRequest, VercelResponse } from "@vercel/node";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
@@ -18,22 +18,30 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(express.static("uploads/"));
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api", authRouter);
-// app.use("/api", userRouter);
-// app.use("/api", appointmentRouter);
+app.use("/api", userRouter);
+app.use("/api", appointmentRouter);
 
 app.use(errorHandler);
 
-AppDataSource.initialize()
-  .then(async () => {
-    app.listen(PORT, () => {
-      console.log("Server is running on http://localhost:" + PORT);
-    });
-    console.log("Data Source has been initialized!");
-  })
-  .catch((error) => console.log(error));
+let isDataSourceInitialized = false;
+async function initDataSource() {
+  if (!isDataSourceInitialized) {
+    try {
+      await AppDataSource.initialize();
+      isDataSourceInitialized = true;
+      console.log("Data Source has been initialized!");
+    } catch (error) {
+      console.error("Error initializing Data Source:", error);
+    }
+  }
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  await initDataSource();
+  app(req, res);
+}
