@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import { UserController } from "../controllers/user.controller";
 import { userValidator } from "../middleware/user.validator";
 import upload from "../helpers/fileupload.helper";

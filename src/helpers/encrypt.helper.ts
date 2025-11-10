@@ -1,6 +1,6 @@
-import * as jwt from "jsonwebtoken";
-import * as bcrypt from "bcrypt";
-import * as dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 dotenv.config();
 const { JWT_SECRET = "", SALT_ROUNDS } = process.env;
 

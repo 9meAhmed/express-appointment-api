@@ -15,7 +15,7 @@ import { Patient } from "../entity/Patient";
 import Encrypt from "../helpers/encrypt.helper";
 import { existsSync, unlink } from "node:fs";
 
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 
 dotenv.config();
 const { APP_URL } = process.env;

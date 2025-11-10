@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { userValidator, loginValidator } from "../middleware/index";
 import { resetPasswordValidator } from "../middleware/reset-password.validator";

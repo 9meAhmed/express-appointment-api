@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import { authentification } from "../middleware/authentification";
 import { authorization } from "../middleware/authorization";
 import { userRoles } from "../enum/user-roles.enum";

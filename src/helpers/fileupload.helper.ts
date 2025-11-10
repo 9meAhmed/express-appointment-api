@@ -1,4 +1,4 @@
-import * as multer from "multer";
+import multer from "multer";
 import { existsSync, mkdirSync, unlink } from "node:fs";
 
 const storage = multer.diskStorage({
