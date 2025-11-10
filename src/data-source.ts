@@ -14,11 +14,8 @@ export const AppDataSource = new DataSource({
   username: DB_USER || "postgres.ifjyrvygbmccilimdojs",
   password: DB_PASSWORD || "vb2SxfcTg55)MFx",
   database: DB_NAME || "postgres",
-
   synchronize: false,
   logging: false,
-  // entities: [isDev ? "src/entity/**/*.ts" : "build/entity/**/*.js"],
-  // migrations: [isDev ? "src/migration/**/*.ts" : "build/migration/**/*.js"],
   entities: isDev ? [__dirname + "/entity/*.js"] : [__dirname + "/entity/*.ts"],
   migrations: isDev
     ? [__dirname + "/migration/*.js"]
