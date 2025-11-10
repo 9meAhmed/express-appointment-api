@@ -1,12 +1,12 @@
 import "reflect-metadata";
-import * as express from "express";
+import express from "express";
 import cors from "cors";
 import { AppDataSource } from "./data-source";
 import errorHandler from "./middleware/errorHandler";
 import { userRouter } from "./routes/user.routes";
 import { authRouter } from "./routes/auth.routes";
 import { appointmentRouter } from "./routes/appointment.routes";
-import * as cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
