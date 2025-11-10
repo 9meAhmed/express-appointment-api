@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import * as express from "express";
-import * as cors from "cors";
+import cors from "cors";
 import { AppDataSource } from "./data-source";
 import errorHandler from "./middleware/errorHandler";
 import { userRouter } from "./routes/user.routes";
