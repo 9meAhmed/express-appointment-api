@@ -1,6 +1,10 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import dotenv from "dotenv";
+import { User } from "./entity/User";
+import { Patient } from "./entity/Patient";
+import { Doctor } from "./entity/Doctor";
+import { Appointment } from "./entity/Appointment";
 
 dotenv.config();
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, MODE } = process.env;
@@ -16,7 +20,7 @@ export const AppDataSource = new DataSource({
   database: DB_NAME || "postgres",
   synchronize: false,
   logging: false,
-  entities: isDev ? [__dirname + "/entity/*.js"] : [__dirname + "/entity/*.ts"],
+  entities: [User, Patient, Doctor, Appointment],
   migrations: isDev
     ? [__dirname + "/migration/*.js"]
     : [__dirname + "/migration/*.ts"],
