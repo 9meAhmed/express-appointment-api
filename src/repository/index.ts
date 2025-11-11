@@ -10,6 +10,8 @@ import { Doctor } from "../entity/Doctor";
 import { AppointmentLogService } from "../service/appointment-log.service";
 import { AppointmentLog } from "../entity/AppointmentLog";
 
+AppDataSource.initialize();
+
 export const userRepository = new UserService(
   AppDataSource.getRepository(User)
 );
