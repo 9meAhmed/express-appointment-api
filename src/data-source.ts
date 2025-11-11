@@ -8,9 +8,7 @@ import { Appointment } from "./entity/Appointment";
 
 dotenv.config();
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, MODE } = process.env;
-
 const isDev = MODE === "development";
-
 export const AppDataSource = new DataSource({
   type: "postgres",
   host: DB_HOST || "aws-1-ap-southeast-2.pooler.supabase.com",
